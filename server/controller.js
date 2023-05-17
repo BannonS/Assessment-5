@@ -1,3 +1,13 @@
+require('dotenv').config();
+
+const { CONNECTION_STRING } = process.env;
+
+const Sequelize = require('sequelize');
+
+const sequelize = new Sequelize(CONNECTION_STRING, {
+  dialect: 'postgres',
+  logging: false
+});
 
 
 module.exports = {
@@ -11,7 +21,12 @@ module.exports = {
                 name varchar
             );
 
-            *****YOUR CODE HERE*****
+            create table cities {
+                city_id serial, primary key,
+                name varchar,
+                rating integer,
+                country_id integer
+            }
 
             insert into countries (name)
             values ('Afghanistan'),
@@ -209,9 +224,21 @@ module.exports = {
             ('Yemen'),
             ('Zambia'),
             ('Zimbabwe');
-        `).then(() => {
+        `,).then(() => {
             console.log('DB seeded!')
             res.sendStatus(200)
         }).catch(err => console.log('error seeding DB', err))
-    }
+    },
+    getCountries(req, res) {
+        sequelize
+          .query('SELECT * FROM countries')
+          .then((result) => {
+            const countries = result[0];
+            res.status(200).json(countries);
+          })
+          .catch((error) => {
+            console.error('Error fetching countries:', error);
+            res.status(500).json({ error: 'Internal server error' });
+          });
+      }
 }
