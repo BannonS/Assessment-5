@@ -21,12 +21,12 @@ module.exports = {
                 name varchar
             );
 
-            create table cities {
-                city_id serial, primary key,
+            create table cities (
+                city_id serial primary key,
                 name varchar,
                 rating integer,
                 country_id integer
-            }
+            );
 
             insert into countries (name)
             values ('Afghanistan'),
@@ -224,11 +224,13 @@ module.exports = {
             ('Yemen'),
             ('Zambia'),
             ('Zimbabwe');
+
         `,).then(() => {
             console.log('DB seeded!')
             res.sendStatus(200)
         }).catch(err => console.log('error seeding DB', err))
     },
+
     getCountries(req, res) {
         sequelize
           .query('SELECT * FROM countries')
@@ -240,5 +242,68 @@ module.exports = {
             console.error('Error fetching countries:', error);
             res.status(500).json({ error: 'Internal server error' });
           });
+      },
+    
+    createCity(req, res) {
+        const { name, rating, countryId } = req.body;
+
+    const insertQuery = `
+        INSERT INTO cities (name, rating, country_id)
+        VALUES ('${name}', ${rating}, ${countryId});
+    `;
+        sequelize
+            .query(insertQuery)
+            .then(([results, metadata]) => {
+            
+            console.log('City created successfully:', results);
+            res.status(200).json({ message: 'City created successfully' });
+            })
+            .catch((error) => {
+            
+            console.error('Error creating city:', error);
+            res.status(500).json({ error: 'Error creating city' });
+        })
+    },
+
+    getCities(req, res) {
+        sequelize
+        .query('SELECT * FROM cities')
+        .then((result) => {
+            const cities = result[0];
+            res.status(200).json(cities)
+        })
+        .catch((error) => {
+            console.log('Error fetching countries:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        })
+     },
+
+     deleteCity(req, res) {
+        const { id } = req.params;
+      
+        const deleteQuery = `
+          DELETE FROM cities
+          WHERE city_id = ${id};
+        `;
+      
+        sequelize
+          .query(deleteQuery)
+          .then(() => {
+            res.status(200).json({ message: 'City deleted successfully' });
+          })
+          .catch((error) => {
+            console.log('Error deleting city:', error);
+            res.status(500).json({ error: 'Internal server error' });
+          });
       }
+
+
+
+
+
+
+
+
+
+
 }
