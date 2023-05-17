@@ -66,3 +66,4 @@ function getCountries() {
 getCountries()
 getCities()
 form.addEventListener('submit', handleSubmit)
+
