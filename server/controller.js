@@ -249,12 +249,13 @@ module.exports = {
 
     const insertQuery = `
         INSERT INTO cities (name, rating, country_id)
-        VALUES ('${name}', ${rating}, ${countryId});
+        VALUES ('${name}', ${rating}, ${countryId})
+        RETURNING *;
     `;
         sequelize
             .query(insertQuery)
             .then(([results, metadata]) => {
-            
+          
             console.log('City created successfully:', results);
             res.status(200).json({ message: 'City created successfully' });
             })
@@ -267,7 +268,7 @@ module.exports = {
 
     getCities(req, res) {
         sequelize
-        .query('SELECT * FROM cities')
+        .query('SELECT * FROM cities ORDER BY rating DESC')
         .then((result) => {
             const cities = result[0];
             res.status(200).json(cities)
